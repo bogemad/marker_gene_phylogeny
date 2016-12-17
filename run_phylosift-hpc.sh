@@ -2,9 +2,8 @@
 
 base_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-source $base_path/.mc/bin/activate phylosift
-out=$1
-temp=$HOME/temp/phylosift_scripts
+out=$base_path/raw_data
+temp=$base_path/temp/phylosift_scripts
 script_path=$base_path/scripts
 
 cd $out
@@ -41,3 +40,5 @@ for file in $(find $out -maxdepth 1 -name "*.fasta" | tail -n +$topnum); do
 	qsub $temp/Phylosift_$num.sh
 	rm $temp/Phylosift_$num.sh
 done
+
+rm -rf $temp

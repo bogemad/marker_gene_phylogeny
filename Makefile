@@ -33,7 +33,7 @@ __check_defined = \
       $(error Undefined $1$(if $2, ($2))))
 
 
-all: ${BASE_BIN}/python ${PHYLOSIFT}/bin/python ${PHYLOSIFT}/share/phylosift_20141126/bin/phylosift
+all: ${BASE_BIN}/python ${MC}/share/phylosift_20141126/bin/phylosift
 
 clean: 
 	rm -rf ${MC} mc.sh
@@ -46,16 +46,14 @@ ${BASE_BIN}/python:
 	bash mc.sh -bf -p ${MC}
 	.mc/bin/conda config --system --add channels r --add channels bioconda --add channels conda-forge
 	.mc/bin/conda config --system --set always_yes True
+	.mc/bin/conda install -y fasttree trimal biopython
+	mkdir -p raw_data analysis_results logs
+	chmod 755 scripts/* run_phylosift-hpc.sh build_tree-hpc.sh
 	rm -fr mc.sh
 
 
-${PHYLOSIFT}/share/phylosift_20141126/bin/phylosift: ${BASE_BIN}/python ${PHYLOSIFT}/bin/python
-	mkdir -p ${PHYLOSIFT}/share
-	cd ${PHYLOSIFT}/share && wget http://edhar.genomecenter.ucdavis.edu/~koadman/phylosift/devel/phylosift_20141126.tar.bz2 && tar xjf phylosift_20141126.tar.bz2
-	mkdir -p ${PHYLOSIFT}/etc/conda/activate.d
-	echo -n "export PATH=${PHYLOSIFT_PATH}/share/phylosift_20141126/bin:" > ${PHYLOSIFT}/etc/conda/activate.d/env_vars.sh
-	echo '$PATH' >> ${PHYLOSIFT}/etc/conda/activate.d/env_vars.sh
+${MC}/share/phylosift_20141126/bin/phylosift: ${BASE_BIN}/python
+	mkdir -p ${MC}/share
+	cd ${MC}/share && wget http://edhar.genomecenter.ucdavis.edu/~koadman/phylosift/devel/phylosift_20141126.tar.bz2 && tar xjf phylosift_20141126.tar.bz2
 
-${PHYLOSIFT}/bin/python: ${BASE_BIN}/python
-	conda create -yn phylosift fasttree trimal
 
