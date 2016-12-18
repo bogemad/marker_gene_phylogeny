@@ -10,4 +10,5 @@
 
 base_path=xxxbasepathxxx
 
-bash $base_path/scripts/build_tree.sh
+xxxcmdxxx
+

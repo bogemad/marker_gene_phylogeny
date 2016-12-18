@@ -36,7 +36,7 @@ __check_defined = \
 all: ${BASE_BIN}/python ${MC}/share/phylosift_20141126/bin/phylosift
 
 clean: 
-	rm -rf ${MC} mc.sh
+	rm -rf ${MC} mc.sh raw_data analysis_results logs .temp
 
 .PHONY: all clean
 .SECONDARY:
@@ -48,7 +48,7 @@ ${BASE_BIN}/python:
 	.mc/bin/conda config --system --set always_yes True
 	.mc/bin/conda install -y fasttree trimal biopython
 	mkdir -p raw_data analysis_results logs
-	chmod 755 scripts/* run_phylosift-hpc.sh build_tree-hpc.sh
+	chmod 755 scripts/* run_phylosift-hpc build_tree-hpc download_genomes
 	rm -fr mc.sh
 
 
