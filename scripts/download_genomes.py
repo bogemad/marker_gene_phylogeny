@@ -41,7 +41,7 @@ def search_genomes(assembly_list, taxon, genome_category):
 					download_path = os.path.join(ftp_path, filename)
 					corrected_organism_name = organism_name.replace(' ','_').replace('/','').replace(':','-').replace('"','').replace('>','').replace('<','').replace('|','-').replace('?','').replace('*','')
 					corrected_strain_name = strain_name.replace(' ','_').replace('/','').replace(':','-').replace('"','').replace('>','').replace('<','').replace('|','-').replace('?','').replace('*','')
-					if strain_name in organism_name or strain_name = '':
+					if strain_name in organism_name or strain_name == '':
 						outfilename = "%s_%s.fasta" % (corrected_organism_name,accession)
 					else:
 						outfilename = "%s_%s_%s.fasta" % (corrected_organism_name,corrected_strain_name,accession)
@@ -52,7 +52,7 @@ def search_genomes(assembly_list, taxon, genome_category):
 				download_path = os.path.join(ftp_path, filename)
 				corrected_organism_name = organism_name.replace(' ','_').replace('/','').replace(':','-').replace('"','').replace('>','').replace('<','').replace('|','-').replace('?','').replace('*','')
 				corrected_strain_name = strain_name.replace(' ','_').replace('/','').replace(':','-').replace('"','').replace('>','').replace('<','').replace('|','-').replace('?','').replace('*','')
-				if strain_name in organism_name or strain_name = '':
+				if strain_name in organism_name or strain_name == '':
 					outfilename = "%s_%s.fasta" % (corrected_organism_name,accession)
 				else:
 					outfilename = "%s_%s_%s.fasta" % (corrected_organism_name,corrected_strain_name,accession)

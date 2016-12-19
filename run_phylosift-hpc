@@ -7,14 +7,16 @@ temp=$base_path/temp/phylosift_scripts
 script_path=$base_path/scripts
 
 cd $out
-num=11
+num=10
 rm -rf $temp
 mkdir -p $temp
 
 while [ $num -lt `find $out -maxdepth 1 -name "*.fasta" | wc -l` ]; do
-	let topnum=num-10
+	let topnum=num-9
+	num_range="${topnum}-${num}"
 	file_list=( $(find $out -maxdepth 1 -name "*.fasta" | tail -n +$topnum | head -n 10) )
-	sed "s~xxxnumxxx~$num~g" $script_path/Phylosift_multirun10.sh | \
+	sed "s~xxxnumxxx~$num_range~g" $script_path/Phylosift_multirun10.sh | \
+	sed "s~xxxbasepathxxx~$base_path~g" | \
 	sed "s~xxxoutxxx~$out~g" | \
 	sed "s~xxxfile0xxx~${file_list[0]}~g" | \
 	sed "s~xxxfile1xxx~${file_list[1]}~g" | \
@@ -26,17 +28,17 @@ while [ $num -lt `find $out -maxdepth 1 -name "*.fasta" | wc -l` ]; do
 	sed "s~xxxfile7xxx~${file_list[7]}~g" | \
 	sed "s~xxxfile8xxx~${file_list[8]}~g" | \
 	sed "s~xxxfile9xxx~${file_list[9]}~g" \
-	> $temp/Phylosift_$num.sh
-	qsub $temp/Phylosift_$num.sh
-	rm $temp/Phylosift_$num.sh
+	> $temp/Phylosift_$num_range.sh
+	qsub $temp/Phylosift_$num_range.sh
+	rm $temp/Phylosift_$num_range.sh
 	let num=num+10
 done
 
-let topnum=num-10
-num=0
+let topnum=num-9
+let num=num-10
 for file in $(find $out -maxdepth 1 -name "*.fasta" | tail -n +$topnum); do
 	let num=num+1
-	sed -e "s~xxxnumxxx~$num~g" $script_path/Phylosift_multirun.sh | sed -e "s~xxxoutxxx~$out~g" | sed -e "s~xxxfilexxx~$file~g" > $temp/Phylosift_$num.sh
+	sed -e "s~xxxnumxxx~$num~g" $script_path/Phylosift_multirun.sh | sed "s~xxxbasepathxxx~$base_path~g" | sed -e "s~xxxoutxxx~$out~g" | sed -e "s~xxxfilexxx~$file~g" > $temp/Phylosift_$num.sh
 	qsub $temp/Phylosift_$num.sh
 	rm $temp/Phylosift_$num.sh
 done
