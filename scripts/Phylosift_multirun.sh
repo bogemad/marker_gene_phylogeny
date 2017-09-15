@@ -6,9 +6,9 @@
 #PBS -o xxxbasepathxxx/logs/Phylosift_xxxnumxxx.out
 #PBS -e xxxbasepathxxx/logs/Phylosift_xxxnumxxx.err
 
-workdir=/scratch/work/psift_xxxnumxxx
 base_path=xxxbasepathxxx
-mkdir $workdir
+workdir=$base_path/.temp/psift_xxxnumxxx
+mkdir -p $workdir
 cd $workdir
 export workdir
 function finish {
