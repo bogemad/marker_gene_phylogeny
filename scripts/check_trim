@@ -8,8 +8,11 @@ raw = AlignIO.read(sys.argv[2], "fasta")
 
 outdir = os.path.dirname(sys.argv[1])
 outfile = open(os.path.join(outdir, sys.argv[3]), 'w')
+num_raw_seqs = sys.argv[4]
 
-outfile.write("Length of raw alignment = %d\n" % len(raw[0]))
+outfile.write("Number sequences in raw alignment = %s\n" % num_raw_seqs)
+outfile.write("Number sequences with gappy sequences removed  = %d\n" % len(raw))
+outfile.write("Length of untrimmed alignment = %d\n" % len(raw[0]))
 outfile.write("Length of trimmed alignment = %d\n" % len(trimmed[0]))
 percent_removed = ((len(raw[0])-len(trimmed[0]))/len(raw[0]))*100
 outfile.write("Percent bases removed by trimming = %.2f%%\n" % percent_removed)

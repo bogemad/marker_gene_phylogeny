@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd /shared/homes/s1/Toni_and_Daniel/Assembled_Xanthomonads/analysis/marker_gene_phylogeny/
+./download_genomes Xanthomonas all

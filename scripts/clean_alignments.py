@@ -1,17 +1,31 @@
 #!/usr/bin/env python
 
-import sys, os, re, shutil
+import sys, os, re, shutil, decimal
 from Bio import SeqIO
 
 base_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
-for limit in (0.1, 0.05, 0.025):
+def drange(x, y, jump):
+	while x < y:
+		yield float(x)
+		x = decimal.Decimal(str(x)) + decimal.Decimal(jump)
+
+if len(sys.argv) == 1:
+	limits = [0.1, 0.05, 0.025]
+elif len(sys.argv) == 4:
+	start = float(sys.argv[1])
+	end = float(sys.argv[2])
+	step = float(sys.argv[3])
+	limits = list(drange(start, end, step))
+
+for limit in limits:
 	raw_records = []
 	records = []
 	ditched_records = []
 	outdir = os.path.join(base_path, 'analysis_results', 'gt_%.1f_percent_gaps_removed' % (limit*100))
 	os.mkdir(outdir)
 	for item in os.listdir(os.path.join(base_path,'raw_data','PS_temp')):
+		print("Cleaning {}...".format(item))
 		record = SeqIO.read(os.path.join(base_path, 'raw_data', 'PS_temp', item, 'alignDir', 'concat.codon.updated.1.fasta'), 'fasta')
 		record.id = re.sub(r'\.1\..*','',record.id)
 		record.name = ''

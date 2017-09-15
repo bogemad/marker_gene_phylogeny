@@ -3,6 +3,7 @@
 import sys, os, ftplib, gzip, shutil
 from Bio import Entrez
 
+
 def ftp_download(down_path, out_dir):
 	server = down_path.split('/')[2]
 	chop = len('ftp://') + len(server)
@@ -84,12 +85,14 @@ if __name__ == '__main__':
 	temp_dir = os.path.join(base_path,'.temp')
 	if os.path.exists(temp_dir) == False:
 		os.mkdir(temp_dir)
-	while True:
-		genome_category = input("Would you like to download all %s genomes or only reference and representative genomes? [Type 'all' or 'reference']: " % sys.argv[1])
-		if genome_category == 'all' or genome_category == 'reference':
-			break
-		print ("%s not a valid response!" % genome_category)
+	# while True:
+		# genome_category = input("Would you like to download all %s genomes or only reference and representative genomes? [Type 'all' or 'reference']: " % sys.argv[1])
+		# if genome_category == 'all' or genome_category == 'reference':
+			# break
+		# print ("%s not a valid response!" % genome_category)
+	genome_category = sys.argv[2]
 	assembly_list = open(ftp_download('ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/bacteria/assembly_summary.txt', temp_dir))
+	print(assembly_list)
 	for item in search_genomes(assembly_list, sys.argv[1], genome_category):
 		download_genomes(item, base_path, temp_dir)
 		

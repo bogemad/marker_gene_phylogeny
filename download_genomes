@@ -9,8 +9,9 @@ rm -rf $temp_scripts
 mkdir -p $temp_scripts
 
 genus=$1
+type=$2
 
 # sed "s~xxxbasepathxxx~$base_path~g" $base_path/scripts/submit_qsub.sh | sed "s~xxxcmdxxx~python $base_path/scripts/download_genomes.py $genus~g" > $temp_scripts/submit_qsub_temp.sh
 # qsub $temp_scripts/submit_qsub_temp.sh
 
-download_genomes.py $genus
+download_genomes.py $genus $type
