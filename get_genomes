@@ -1,4 +1,13 @@
 #!/bin/bash
 
-cd /shared/homes/s1/Toni_and_Daniel/Assembled_Xanthomonads/analysis/marker_gene_phylogeny/
-./download_genomes Xanthomonas all
+if [ "$#" -ne 2 ]; then
+  echo ""
+  echo "This script downloads all ncbi genomes from a given genus using a PBS qsub job"
+  echo "Provide the base directory of the marker gene phylogeny git clone and the bacterial genus"
+  echo ""
+  echo "Usage: get_genomes <marker_gene_phylogeny_directory> <bacterial_genus>"
+  echo ""
+fi
+
+cd $1
+./download_genomes $2 all
