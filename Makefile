@@ -54,7 +54,7 @@ ${BASE_BIN}/python:
 
 ${MC}/opt/phylosift_20141126/bin/phylosift: ${BASE_BIN}/python
 	mkdir -p ${MC}/opt
-	mv phylosift_20141126.tar.bz2 ${MC}/opt && cd ${MC}/opt && tar xjf phylosift_20141126.tar.bz2 && rm phylosift_20141126.tar.bz2
+	cp phylosift_20141126.tar.bz2 ${MC}/opt && cd ${MC}/opt && tar xjf phylosift_20141126.tar.bz2 && rm phylosift_20141126.tar.bz2
 
 
 
