@@ -1,13 +1,25 @@
 #!/bin/bash
 
-if [ "$#" -ne 2 ]; then
+
+no_var_output(){
   echo ""
   echo "This script downloads all ncbi genomes from a given genus"
-  echo "Provide the base directory of the marker gene phylogeny git clone and the bacterial genus"
   echo ""
-  echo "Usage: get_genomes <marker_gene_phylogeny_directory> <bacterial_genus>"
+  echo "Please provide the following variables by running the below commands using your own input:"
   echo ""
-fi
+  echo "export basedir=<marker_gene_phylogeny_directory>"
+  echo "export genus=<bacterial_genus>"
+  echo ""
+  echo "Once the above variables are set then this script will run correctly..."
+  echo ""
+}
 
-cd $1
-./download_genomes $2 all
+
+if [ -z ${basedir+x} ]; then
+  no_var_output
+elif [ -z ${genus+x} ]; then
+  no_var_output
+else
+  cd $basedir
+  ./download_genomes $genus all
+fi
