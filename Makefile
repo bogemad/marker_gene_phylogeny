@@ -33,7 +33,7 @@ __check_defined = \
       $(error Undefined $1$(if $2, ($2))))
 
 
-all: ${BASE_BIN}/python ${MC}/share/phylosift_20141126/bin/phylosift
+all: ${BASE_BIN}/python ${MC}/share/PhyloSift-1.0.0_01/bin/phylosift
 
 clean: 
 	rm -rf ${MC} mc.sh raw_data analysis_results logs .temp
@@ -52,8 +52,8 @@ ${BASE_BIN}/python:
 	rm -fr mc.sh
 
 
-${MC}/share/phylosift_20141126/bin/phylosift: ${BASE_BIN}/python
+${MC}/share/PhyloSift-1.0.0_01/bin/phylosift: ${BASE_BIN}/python
 	mkdir -p ${MC}/share
-	cd ${MC}/share && wget http://edhar.genomecenter.ucdavis.edu/~koadman/phylosift/devel/phylosift_20141126.tar.bz2 && tar xjf phylosift_20141126.tar.bz2
+	cd ${MC}/share && wget https://github.com/gjospin/PhyloSift/archive/v1.0.0_01.tar.gz && tar xzf v1.0.0_01.tar.gz
 
 
