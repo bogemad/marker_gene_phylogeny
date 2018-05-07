@@ -33,7 +33,7 @@ __check_defined = \
       $(error Undefined $1$(if $2, ($2))))
 
 
-all: ${BASE_BIN}/python ${MC}/share/PhyloSift-1.0.0_01/bin/phylosift
+all: ${BASE_BIN}/python ${MC}/opt/phylosift_20141126/bin/phylosift
 
 clean: 
 	rm -rf ${MC} mc.sh raw_data analysis_results logs .temp
