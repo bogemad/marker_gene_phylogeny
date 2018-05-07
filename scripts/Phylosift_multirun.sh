@@ -16,7 +16,7 @@ function finish {
 }
 trap finish EXIT
 
-cp -av $base_path/.mc/share/PhyloSift-1.0.0_01 .
+cp -av $base_path/.mc/opt/phylosift_20141126 .
 phylodir=$workdir/PhyloSift-1.0.0_01
 
 out=xxxoutxxx

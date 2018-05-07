@@ -52,8 +52,9 @@ ${BASE_BIN}/python:
 	rm -fr mc.sh
 
 
-${MC}/share/PhyloSift-1.0.0_01/bin/phylosift: ${BASE_BIN}/python
-	mkdir -p ${MC}/share
-	cd ${MC}/share && wget https://github.com/gjospin/PhyloSift/archive/v1.0.0_01.tar.gz && tar xzf v1.0.0_01.tar.gz
+${MC}/opt/phylosift_20141126/bin/phylosift: ${BASE_BIN}/python
+	mkdir -p ${MC}/opt
+	mv phylosift_20141126.tar.bz2 ${MC}/opt && cd ${MC}/opt && tar xjf phylosift_20141126.tar.bz2 && rm phylosift_20141126.tar.bz2
+
 
 

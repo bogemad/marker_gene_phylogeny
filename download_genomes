@@ -1,7 +1,7 @@
 #!/bin/bash
 
 base_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export PATH=$base_path/.mc/bin:$base_path/scripts:$base_path/.mc/share/phylosift_20141126:$PATH
+export PATH=$base_path/.mc/bin:$base_path/scripts:$base_path/.mc/opt/phylosift_20141126:$PATH
 
 temp_scripts=$base_path/.temp
 rm -rf $temp_scripts
