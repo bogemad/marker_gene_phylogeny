@@ -2,7 +2,7 @@
 
 if [ "$#" -ne 2 ]; then
   echo ""
-  echo "This script downloads all ncbi genomes from a given genus using a PBS qsub job"
+  echo "This script downloads all ncbi genomes from a given genus"
   echo "Provide the base directory of the marker gene phylogeny git clone and the bacterial genus"
   echo ""
   echo "Usage: get_genomes <marker_gene_phylogeny_directory> <bacterial_genus>"
