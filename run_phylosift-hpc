@@ -25,6 +25,5 @@ for i, file in enumerate(out_files):
 		'-q', 'smallq',
 		'-o', os.path.join(base_path, 'logs', 'Phylosift_{}.out'.format(i)),
 		'-e', os.path.join(base_path, 'logs', 'Phylosift_{}.err'.format(i)),
-		'-v', 'base_path={}, out={}, file={}'.format(base_path, out, file),
-		os.path.join(script_path, 'Phylosift_multirun.sh')]
-
+		'-v', 'base_path={}, out={}, file={}, num={}'.format(base_path, out, file, i),
+		os.path.join(script_path, 'Phylosift_multirun.sh')])
