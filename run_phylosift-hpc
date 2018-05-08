@@ -1,43 +1,30 @@
-#!/bin/bash
+#!/usr/bin/env python
 
-base_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+import os, shutil, subprocess
 
-out=$base_path/raw_data
-temp=$base_path/temp/phylosift_scripts
-script_path=$base_path/scripts
+base_path = os.path.dirname(os.path.realpath(__file__))
+out = os.path.join(base_path, 'raw_data')
+temp = os.path.join(base_path, 'temp', 'phylosift_scripts')
+script_path = os.path.join(base_path, 'scripts')
+out_files = os.listdir(out)
 
-cd $out
-num=10
-rm -rf $temp
-mkdir -p $temp
+def make_temp_dirs(base_path, temp):
+	if os.path.isdir(os.path.join(base_path, 'temp')) == False:
+		os.mkdir(os.path.join(base_path, 'temp'))
+	if os.path.isdir(temp):
+		shutil.rmtree(temp)
+	os.mkdir(temp)
 
-while [ $num -lt `find $out -maxdepth 1 -name "*.fasta" | wc -l` ]; do
-	let topnum=num-9
-	file_list=( $(find $out -maxdepth 1 -name "*.fasta" | tail -n +$topnum | head -n 10) )
-	sed "s~xxxnumxxx~$topnum~g" $script_path/Phylosift_multirun10.sh | \
-	sed "s~xxxbasepathxxx~$base_path~g" | \
-	sed "s~xxxoutxxx~$out~g" | \
-	sed "s~xxxfile0xxx~${file_list[0]}~g" | \
-	sed "s~xxxfile1xxx~${file_list[1]}~g" | \
-	sed "s~xxxfile2xxx~${file_list[2]}~g" | \
-	sed "s~xxxfile3xxx~${file_list[3]}~g" | \
-	sed "s~xxxfile4xxx~${file_list[4]}~g" | \
-	sed "s~xxxfile5xxx~${file_list[5]}~g" | \
-	sed "s~xxxfile6xxx~${file_list[6]}~g" | \
-	sed "s~xxxfile7xxx~${file_list[7]}~g" | \
-	sed "s~xxxfile8xxx~${file_list[8]}~g" | \
-	sed "s~xxxfile9xxx~${file_list[9]}~g" \
-	> $temp/Phylosift_$num_range.sh
-	qsub $temp/Phylosift_$num_range.sh
-	rm $temp/Phylosift_$num_range.sh
-	let num=num+10
-done
 
-let topnum=num-9
-let num=num-10
-for file in $(find $out -maxdepth 1 -name "*.fasta" | tail -n +$topnum); do
-	let num=num+1
-	sed -e "s~xxxnumxxx~$num~g" $script_path/Phylosift_multirun.sh | sed "s~xxxbasepathxxx~$base_path~g" | sed -e "s~xxxoutxxx~$out~g" | sed -e "s~xxxfilexxx~$file~g" > $temp/Phylosift_$num.sh
-	qsub $temp/Phylosift_$num.sh
-	rm $temp/Phylosift_$num.sh
-done
+for i, file in enumerate(out_files):
+	subprocess.check_output(['qsub',
+		'-N', 'Phylosift_{}'.format(i),
+		'-l', 'ncpus=1',
+		'-l', 'mem=8gb',
+		'-l', 'walltime=2:00:00',
+		'-q', 'smallq',
+		'-o', os.path.join(base_path, 'logs', 'Phylosift_{}.out'.format(i)),
+		'-e', os.path.join(base_path, 'logs', 'Phylosift_{}.err'.format(i)),
+		'-v', 'base_path={}, out={}, file={}'.format(base_path, out, file),
+		os.path.join(script_path, 'Phylosift_multirun.sh')]
+

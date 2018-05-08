@@ -1,10 +1,4 @@
-#PBS -N Phylosift_xxxnumxxx
-#PBS -l ncpus=1
-#PBS -l mem=8gb
-#PBS -l walltime=2:00:00
-#PBS -q smallq
-#PBS -o xxxbasepathxxx/logs/Phylosift_xxxnumxxx.out
-#PBS -e xxxbasepathxxx/logs/Phylosift_xxxnumxxx.err
+#!/bin/bash
 
 base_path=xxxbasepathxxx
 workdir=$base_path/.temp/psift_xxxnumxxx
