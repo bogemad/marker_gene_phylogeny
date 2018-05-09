@@ -17,7 +17,7 @@ def make_temp_dirs(base_path, temp):
 
 
 for i, file in enumerate(out_files):
-	new_file_name = re.sub(r'[^A-Za-z0-9_-]', '_', file)
+	new_file_name = re.sub(r'[^A-Za-z0-9_.-]', '_', file)
 	os.rename(os.path.join(out, file), os.path.join(out, new_file_name))
 	subprocess.check_output(['qsub',
 		'-N', 'Phylosift_{}'.format(i),
