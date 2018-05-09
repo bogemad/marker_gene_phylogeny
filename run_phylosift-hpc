@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, shutil, subprocess
+import os, shutil, subprocess, re
 
 base_path = os.path.dirname(os.path.realpath(__file__))
 out = os.path.join(base_path, 'raw_data')
