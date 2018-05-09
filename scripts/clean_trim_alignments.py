@@ -79,7 +79,7 @@ for limit in limits:
 
 trimming_summary_path = os.path.join(base_path, 'analysis_results', "trimming_summary.txt")
 with open(trimming_summary_path, 'w') as trimming_summary:
-	trimming_summary.write("Gap threshold\tNumber sequences in raw alignment\tNumber sequences removed\tLength of untrimmed alignment\tLength of trimmed alignment\tPercent bases removed by trimming\n")
+	trimming_summary.write("Gap threshold\t# sequences in raw alignment\t# sequences with less gaps than limit\tLength of untrimmed alignment\tLength of trimmed alignment\tPercent bases removed by trimming\n")
 	for limit in sorted(list(data_d)):
 		trimming_summary.write("{0:.2f}\t{1}\t{2}\t{3}\t{4}\t{5}\n".format(limit, data_d[limit][0],data_d[limit][1],data_d[limit][2],data_d[limit][3],data_d[limit][4]))
 

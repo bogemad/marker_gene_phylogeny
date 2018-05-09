@@ -9,7 +9,7 @@ function finish {
 }
 trap finish EXIT
 
-cp -av $base_path/.mc/opt/phylosift_20141126 .
+cp -a $base_path/.mc/opt/phylosift_20141126 .
 phylodir=$workdir/phylosift_20141126
 
 cd $out
