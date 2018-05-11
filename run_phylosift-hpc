@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os, shutil, subprocess, re
 
@@ -19,16 +19,18 @@ def make_temp_dirs(base_path, temp):
 
 
 for i, file in enumerate(out_files):
-	new_file_name = re.sub(r'[^A-Za-z0-9_.-]', '_', file)
-	os.rename(os.path.join(out, file), os.path.join(out, new_file_name))
-	if not new_file_name in ps_temp_dirs:
-		subprocess.check_output(['qsub',
-			'-N', 'Phylosift_{}'.format(i),
-			'-l', 'ncpus=1',
-			'-l', 'mem=8gb',
-			'-l', 'walltime=2:00:00',
-			'-q', 'smallq',
-			'-o', os.path.join(base_path, 'logs', 'Phylosift_{}.out'.format(i)),
-			'-e', os.path.join(base_path, 'logs', 'Phylosift_{}.err'.format(i)),
-			'-v', 'base_path={}, out={}, file={}, num={}'.format(base_path, out, new_file_name, i),
-			os.path.join(script_path, 'Phylosift_multirun.sh')])
+	if os.path.isfile(file):
+		new_file_name = re.sub(r'[^A-Za-z0-9_.-]', '_', file)
+		os.rename(os.path.join(out, file), os.path.join(out, new_file_name))
+		if not new_file_name in ps_temp_dirs:
+			print("Running phylosift on {}".format(new_file_name))
+			subprocess.check_output(['qsub',
+				'-N', 'Phylosift_{}'.format(i),
+				'-l', 'ncpus=1',
+				'-l', 'mem=8gb',
+				'-l', 'walltime=2:00:00',
+				'-q', 'smallq',
+				'-o', os.path.join(base_path, 'logs', 'Phylosift_{}.out'.format(i)),
+				'-e', os.path.join(base_path, 'logs', 'Phylosift_{}.err'.format(i)),
+				'-v', 'base_path={}, out={}, file={}, num={}'.format(base_path, out, new_file_name, i),
+				os.path.join(script_path, 'Phylosift_multirun.sh')])
