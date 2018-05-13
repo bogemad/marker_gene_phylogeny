@@ -2,14 +2,6 @@
 
 import os, shutil, subprocess, re
 
-base_path = os.path.dirname(os.path.realpath(__file__))
-out = os.path.join(base_path, 'raw_data')
-temp = os.path.join(base_path, 'temp', 'phylosift_scripts')
-script_path = os.path.join(base_path, 'scripts')
-out_files = os.listdir(out)
-ps_temp_dirs = os.listdir(os.path.join(out, 'PS_temp'))
-
-
 def make_temp_dirs(base_path, temp):
 	if os.path.isdir(os.path.join(base_path, 'temp')) == False:
 		os.mkdir(os.path.join(base_path, 'temp'))
@@ -18,19 +10,50 @@ def make_temp_dirs(base_path, temp):
 	os.mkdir(temp)
 
 
-for i, file in enumerate(out_files):
-	if os.path.isfile(file):
+def submit_phylosift_job(new_file_name, i, base_path, out, script_path):
+	print("Running phylosift on {}".format(new_file_name))
+	subprocess.check_output(['qsub',
+		'-N', 'Phylosift_{}'.format(i),
+		'-l', 'ncpus=1',
+		'-l', 'mem=8gb',
+		'-l', 'walltime=2:00:00',
+		'-q', 'smallq',
+		'-o', os.path.join(base_path, 'logs', 'Phylosift_{}.out'.format(i)),
+		'-e', os.path.join(base_path, 'logs', 'Phylosift_{}.err'.format(i)),
+		'-v', 'base_path={}, out={}, file={}, num={}'.format(base_path, out, new_file_name, i),
+		os.path.join(script_path, 'Phylosift_multirun.sh')])
+
+def main():
+	base_path = os.path.dirname(os.path.realpath(__file__))
+	print("\nbase_path = {}".format(base_path))
+	out = os.path.join(base_path, 'raw_data')
+	print("out = {}".format(out))
+	temp = os.path.join(base_path, 'temp', 'phylosift_scripts')
+	print("temp = {}".format(temp))
+	script_path = os.path.join(base_path, 'scripts')
+	print("script_path = {}".format(script_path))
+	out_files = os.listdir(out)
+	print("\nDetected {} genomes for analysis\n".format(sum(os.path.isdir(os.path.join(out, file))==False for file in out_files)))
+	ps_temp_path = os.path.join(out, 'PS_temp')
+	print("ps_temp_path = {}".format(ps_temp_path))
+	if os.path.isdir(ps_temp_path):
+		ps_temp_dirs = os.listdir(ps_temp_path)
+	else:
+		ps_temp_dirs = ""
+	print("\nDetected analysis completed for {} genomes.\n".format(len(ps_temp_dirs)))
+	make_temp_dirs(base_path, temp)
+	print("Variable and folder setup complete.")
+	for i, file in enumerate(out_files):
+		if os.path.isdir(os.path.join(out, file)):
+			continue
 		new_file_name = re.sub(r'[^A-Za-z0-9_.-]', '_', file)
 		os.rename(os.path.join(out, file), os.path.join(out, new_file_name))
-		if not new_file_name in ps_temp_dirs:
-			print("Running phylosift on {}".format(new_file_name))
-			subprocess.check_output(['qsub',
-				'-N', 'Phylosift_{}'.format(i),
-				'-l', 'ncpus=1',
-				'-l', 'mem=8gb',
-				'-l', 'walltime=2:00:00',
-				'-q', 'smallq',
-				'-o', os.path.join(base_path, 'logs', 'Phylosift_{}.out'.format(i)),
-				'-e', os.path.join(base_path, 'logs', 'Phylosift_{}.err'.format(i)),
-				'-v', 'base_path={}, out={}, file={}, num={}'.format(base_path, out, new_file_name, i),
-				os.path.join(script_path, 'Phylosift_multirun.sh')])
+		if ps_temp_path != "":
+			if not new_file_name in ps_temp_dirs:
+				submit_phylosift_job(new_file_name, i, base_path, out, script_path)
+		else:
+			submit_phylosift_job(new_file_name, i, base_path, out, script_path)
+
+
+if __name__ == '__main__':
+	main()
