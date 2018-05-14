@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# base_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+temp_scripts=$base_path/.temp
+rm -rf $temp_scripts
+mkdir -p $temp_scripts
+
+results=$base_path/analysis_results
+
+if [ "$(ls $results)" != '' ]; then
+	echo "saving previous results"
+	dt=`date '+%d-%m-%Y_%H-%M-%S'`
+	tar czf $base_path/previous_analysis_$dt.tar.gz $results &> /dev/null
+	rm -rf $results
+	mkdir $results
+fi
+
+gen_job_script(){
+echo "#!/bin/bash
+
+base_path=$1
+
+$2
+" > $temp_scripts/submit_qsub_temp.sh
+}
+
+echo "Submitting jobs for default limits..."
+for limit in 1 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.1; do
+	gen_job_script $base_path "$base_path/scripts/build_tree.sh $limit"
+	qsub -N build_tree_$limit -l ncpus=1 -l mem=4gb -l walltime=24:00:00 -j oe -o $base_path/logs/build_tree_$limit.log -q smallq $temp_scripts/submit_qsub_temp.sh >> $temp_scripts/submitted_jobs.txt
+	rm $temp_scripts/submit_qsub_temp.sh
+	echo "$limit" >> $temp_scripts/submitted_limits.txt
+done
+
+echo "Submitting jobs for custom limits..."
+for limit in "$@"; do
+	gen_job_script $base_path "$base_path/scripts/build_tree.sh $limit"
+	qsub -N build_tree_$limit -l ncpus=1 -l mem=4gb -l walltime=24:00:00 -j oe -o $base_path/logs/build_tree_$limit.log -q smallq $temp_scripts/submit_qsub_temp.sh >> $temp_scripts/submitted_jobs.txt
+	rm $temp_scripts/submit_qsub_temp.sh
+	echo "$limit" >> $temp_scripts/submitted_limits.txt
+done
+
+echo "Generating dependency list..."
+depend_list="depend=afterok"
+for jobid in `cat $temp_scripts/submitted_jobs.txt`; do
+	depend_list+=":$jobid"
+done
+
+echo "Generating limit list..."
+limit_list=""
+for limit in `cat $temp_scripts/submitted_limits.txt`; do
+	limit_list+="$limit "
+done
+
+echo "Submitting job to generate trimming summary..."
+gen_job_script $base_path "$base_path/scripts/build_tree.sh $limit_list"
+qsub -N gen_trimsummary -l ncpus=1 -l mem=4gb -l walltime=24:00:00 -j oe -o $base_path/logs/gen_trimsummary.log -q smallq -W $depend_list $temp_scripts/submit_qsub_temp.sh
+rm $temp_scripts/*
+
+
+echo "Commands for cleaning/trimming alignments and building trees have been submitted to the job queue. Use 'qstat' to check the status..."

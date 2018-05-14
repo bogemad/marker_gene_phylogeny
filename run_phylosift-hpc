@@ -10,18 +10,19 @@ def make_temp_dirs(base_path, temp):
 	os.mkdir(temp)
 
 
-def submit_phylosift_job(new_file_name, i, base_path, out, script_path):
+def submit_phylosift_job(temp, new_file_name, i, base_path, out, script_path):
 	print("Running phylosift on {}".format(new_file_name))
-	subprocess.check_output(['qsub',
-		'-N', 'Phylosift_{}'.format(i),
-		'-l', 'ncpus=1',
-		'-l', 'mem=8gb',
-		'-l', 'walltime=2:00:00',
-		'-q', 'smallq',
-		'-o', os.path.join(base_path, 'logs', 'Phylosift_{}.out'.format(i)),
-		'-e', os.path.join(base_path, 'logs', 'Phylosift_{}.err'.format(i)),
-		'-v', 'base_path={}, out={}, file={}, num={}'.format(base_path, out, new_file_name, i),
-		os.path.join(script_path, 'Phylosift_multirun.sh')])
+	with open(os.path.join(temp, "jobids.txt"), 'a') as jobids:
+		subprocess.run(['qsub',
+			'-N', 'Phylosift_{}'.format(i),
+			'-l', 'ncpus=1',
+			'-l', 'mem=8gb',
+			'-l', 'walltime=2:00:00',
+			'-q', 'smallq',
+			'-o', os.path.join(base_path, 'logs', 'Phylosift_{}.out'.format(i)),
+			'-e', os.path.join(base_path, 'logs', 'Phylosift_{}.err'.format(i)),
+			'-v', 'base_path={}, out={}, file={}, num={}'.format(base_path, out, new_file_name, i),
+			os.path.join(script_path, 'Phylosift_multirun.sh')], stdout=jobids)
 
 def main():
 	base_path = os.path.dirname(os.path.realpath(__file__))
@@ -50,9 +51,35 @@ def main():
 		os.rename(os.path.join(out, file), os.path.join(out, new_file_name))
 		if ps_temp_path != "":
 			if not new_file_name in ps_temp_dirs:
-				submit_phylosift_job(new_file_name, i, base_path, out, script_path)
+				submit_phylosift_job(temp, new_file_name, i, base_path, out, script_path)
 		else:
-			submit_phylosift_job(new_file_name, i, base_path, out, script_path)
+			submit_phylosift_job(temp, new_file_name, i, base_path, out, script_path)
+	if os.path.isfile(os.path.join(temp, "jobids.txt")):
+		with open(os.path.join(temp, "jobids.txt")) as jobid_h:
+			jobids = [ x.strip() for x in jobid_h if x != "" ]
+			null = subprocess.run(['qsub',
+				'-N', 'build_tree'.format(i),
+				'-l', 'ncpus=1',
+				'-l', 'mem=1gb',
+				'-l', 'walltime=1:00:00',
+				'-q', 'smallq',
+				'-j', 'oe',
+				'-o', os.path.join(base_path, 'logs', 'build_tree.log'.format(i)),
+				'-W', 'depend=afterok:{}'.format(":".join(jobids)),
+				'-v', 'base_path={}'.format(base_path),
+				os.path.join(base_path, 'scripts', 'build_tree-hpc')])
+		os.remove(os.path.join(temp, "jobids.txt"))
+	else:
+		null = subprocess.run(['qsub',
+			'-N', 'build_tree'.format(i),
+			'-l', 'ncpus=1',
+			'-l', 'mem=1gb',
+			'-l', 'walltime=1:00:00',
+			'-q', 'smallq',
+			'-j', 'oe',
+			'-o', os.path.join(base_path, 'logs', 'build_tree.log'.format(i)),
+			'-v', 'base_path={}'.format(base_path),
+			os.path.join(base_path, 'scripts', 'build_tree-hpc')])
 
 
 if __name__ == '__main__':
