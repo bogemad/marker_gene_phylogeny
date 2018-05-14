@@ -6,6 +6,36 @@ rm -rf $temp_scripts
 
 mkdir -p $temp_scripts
 
-sed "s~xxxbasepathxxx~$base_path~g" $base_path/scripts/submit_qsub.sh | sed 's~xxxcmdxxx~bash $base_path/scripts/build_tree.sh~g' > $temp_scripts/submit_qsub_temp.sh
-qsub $temp_scripts/submit_qsub_temp.sh
+for limit in 0 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.1; do
+	sed "s~xxxbasepathxxx~$base_path~g" $base_path/scripts/submit_qsub.sh | sed "s~xxxcmdxxx~bash $base_path/scripts/build_tree.sh $limit~g" > $temp_scripts/submit_qsub_temp.sh
+	qsub $temp_scripts/submit_qsub_temp.sh >> $temp_scripts/submitted_jobs.txt
+	sleep 2
+	rm $temp_scripts/submit_qsub_temp.sh
+	echo "$limit" >> $temp_scripts/submitted_limits.txt
+done
 
+for limit in "$@"; do
+	sed "s~xxxbasepathxxx~$base_path~g" $base_path/scripts/submit_qsub.sh | sed "s~xxxcmdxxx~bash $base_path/scripts/build_tree.sh $limit~g" > $temp_scripts/submit_qsub_temp.sh
+	qsub $temp_scripts/submit_qsub_temp.sh >> $temp_scripts/submitted_jobs.txt
+	sleep 2
+	rm $temp_scripts/submit_qsub_temp.sh
+	echo "$limit" >> $temp_scripts/submitted_limits.txt
+done
+
+depend_list="depend=afterok"
+for jobid in `cat $temp_scripts/submitted_jobs.txt`; do
+	depend_list+=":$jobid"
+done
+
+limit_list=""
+for limit in `cat $temp_scripts/submitted_limits.txt`; do
+	limit_list+="$limit "
+done
+
+sed "s~xxxbasepathxxx~$base_path~g" $base_path/scripts/submit_qsub.sh | sed "s~xxxcmdxxx~bash $base_path/scripts/build_tree.sh $limit_list~g" > $temp_scripts/submit_qsub_temp.sh
+qsub -W $depend_list $temp_scripts/submit_qsub_temp.sh 
+sleep 2
+rm $temp_scripts/*
+
+
+echo "Commands for cleaning,/trimming alignments and building trees have been submitted to the job queue. Use 'qstat' to check the status..."
