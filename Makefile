@@ -48,7 +48,7 @@ ${BASE_BIN}/python:
 	.mc/bin/conda config --system --set always_yes True
 	.mc/bin/conda install -y fasttree trimal biopython
 	mkdir -p raw_data analysis_results logs
-	chmod 755 scripts/* run_phylosift-hpc build_tree-hpc download_genomes
+	chmod 755 scripts/* run_phylosift-hpc rebuild_tree-hpc download_genomes
 	rm -fr mc.sh
 
 
