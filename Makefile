@@ -46,9 +46,9 @@ ${BASE_BIN}/python:
 	bash mc.sh -bf -p ${MC}
 	.mc/bin/conda config --system --add channels r --add channels bioconda --add channels conda-forge
 	.mc/bin/conda config --system --set always_yes True
-	.mc/bin/conda install -y fasttree trimal biopython
+	.mc/bin/conda install -y fasttree trimal biopython ncbi-genome-download
 	mkdir -p raw_data analysis_results logs
-	chmod 755 scripts/* run_phylosift-hpc rebuild_tree-hpc download_genomes
+	chmod 755 scripts/* run_phylosift-hpc rebuild_tree-hpc ncbi-genome-download
 	rm -fr mc.sh
 
 

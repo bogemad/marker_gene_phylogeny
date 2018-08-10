@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+
+import os, sys, re, gzip, shutil, argparse, logging
+import ncbi_genome_download as ngd
+
+
+def get_hr_name(path):
+	broken_up_path = path.strip('/').split('/')
+	human_readable_detected = False
+	j = 0
+	for i, name in enumerate(broken_up_path):
+		if human_readable_detected == True and j != 2:
+			j += 1
+		elif human_readable_detected == True and j == 2:
+			return broken_up_path[i:]
+		if name == 'human_readable':
+			human_readable_detected = True
+
+def rename_and_extract(dl_genome_path, base_path):
+	for root, dirs, files in os.walk(os.path.join(dl_genome_path, 'human_readable')):
+		for file in files:
+			if file.endswith('fna.gz'):
+				name = "_".join(get_hr_name(root) + [ os.path.basename(os.path.dirname(os.readlink(os.path.join(root, file)))), '.fasta' ])
+				print("Extracting {}...".format(name))
+				with gzip.open(os.readlink(os.path.join(root, file)), 'rb') as infile, open(os.path.join(base_path, 'raw_data', name), 'wb') as outfile:
+					for line in infile:
+						outfile.write(line)
+
+def main():
+	base_path = os.path.dirname(os.path.realpath(__file__))
+	dl_genome_path = os.path.join(base_path, 'temp_genome_dl')
+	#os.mkdir(dl_genome_path)
+	
+	parser = ngd.argument_parser(version=ngd.__version__)
+	args = parser.parse_args()
+	
+	if args.debug:
+		log_level = logging.DEBUG
+	elif args.verbose:
+		log_level = logging.INFO
+	else:
+		log_level = logging.WARNING
+	logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
+	
+	logging.info("Downloading genomes...")
+	# ngd.download(section=args.section, group=args.group, output=dl_genome_path, file_format='fasta', assembly_level=args.assembly_level, refseq_category=args.refseq_category, genus=args.genus, species_taxid=args.species_taxid, taxid=args.taxid, human_readable=True, parallel=args.parallel)
+	logging.info("Extracting genomes and saving to raw_data directory...")
+	rename_and_extract(dl_genome_path, base_path)
+
+if __name__ == '__main__':
+	main()
+	
